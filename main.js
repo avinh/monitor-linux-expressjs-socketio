@@ -25,7 +25,6 @@ http.listen(3000, function () {
         netstatHistogram[i] = [i, 0];
     }
 
-
     setInterval(() => {
         cpu.usage()
             .then(value => {
