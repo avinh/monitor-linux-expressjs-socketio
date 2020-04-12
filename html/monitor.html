@@ -1,0 +1,165 @@
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    google.charts.load('current', { packages: ['corechart', 'line'] })
+    google.charts.setOnLoadCallback(drawBasicCPU);
+    google.charts.setOnLoadCallback(drawBasicNetstat);
+    google.charts.setOnLoadCallback(drawPieChartMemory);
+    google.charts.setOnLoadCallback(drawPieChartDrive);
+
+    var chartLoadedCPU = false;
+    var chartLoadedNetstat = false;
+    var chartLoadedMemory = false;
+    var chartLoadedDrive = false;
+
+    var histogramCPU = [];
+    var histogramNetstat = [];
+    var histogramMemory = [];
+    var histogramDrive = [];
+
+    function drawBasicCPU() {
+        let data = new google.visualization.DataTable();
+        data.addColumn("number", "X");
+        data.addColumn("number", "CPU");
+
+        data.addRows(histogramCPU);
+
+        let options = {
+            title: 'CPU History',
+            hAxis: {
+                title: 'Seconds',
+            },
+            vXsix: {
+                title: 'CPU Load',
+                viewWindows: {
+                    min: 0,
+                    max: 100
+                }
+            },
+            width: 600,
+            height: 300
+        }
+
+        let chartCPU = new google.visualization.LineChart(document.getElementById('chart_cpu'))
+        chartCPU.draw(data, options);
+
+        chartLoadedCPU = true;
+    }
+
+    function drawBasicNetstat() {
+        let dataNetstat = new google.visualization.DataTable();
+        dataNetstat.addColumn('number', 'X');
+        dataNetstat.addColumn('number', 'Send');
+        dataNetstat.addColumn('number', 'Down');
+        dataNetstat.addRows(histogramNetstat);
+
+        let options = {
+            title: 'Network History',
+            hAxis: {
+                title: 'Seconds',
+            },
+            vXsix: {
+                title: 'Netstat Load',
+                viewWindows: {
+                    min: 0,
+                    max: 100
+                }
+            },
+            width: 600,
+            height: 300
+        }
+
+        let chart = new google.visualization.LineChart(document.getElementById('chart_netstat'))
+        chart.draw(dataNetstat, options);
+
+        chartLoadedNetstat = true;
+    }
+
+    function drawPieChartMemory() {
+        let data = new google.visualization.DataTable();
+        data.addColumn('string', 'Menory');
+        data.addColumn('number', 'Mb');
+        data.addRows([
+            ['Used', histogramMemory.usedMemMb],
+            ['Free', histogramMemory.freeMemMb]
+        ]);
+
+        let options = {
+            title: 'How Much Memory',
+            width: 600,
+            height: 300
+        };
+
+        let chart = new google.visualization.PieChart(document.getElementById('chart_memory'));
+        chart.draw(data, options);
+        chartLoadedMemory = true;
+    }
+
+    function drawPieChartDrive() {
+        let data = new google.visualization.DataTable();
+        data.addColumn('string', 'Drive');
+        data.addColumn('number', 'Gb');
+        data.addRows([
+            ['Used', parseInt(histogramDrive.usedGb)],
+            ['Free', parseInt(histogramDrive.freeGb)]
+        ]);
+
+        console.log(histogramDrive.freeGb)
+
+        let options = {
+            title: 'How Much Drive',
+            width: 600,
+            height: 300
+        };
+
+        let chart = new google.visualization.PieChart(document.getElementById('chart_drive'));
+        chart.draw(data, options);
+        chartLoadedDrive = true;
+    }
+
+    var socket = io();
+
+    socket.on('cpu histogram', function (value) {
+        histogramCPU = value;
+        if (chartLoadedCPU) {
+            drawBasicCPU();
+        }
+    })
+
+    socket.on('netstat histogram', function (value) {
+        histogramNetstat = value;
+        if (chartLoadedNetstat) {
+            drawBasicNetstat();
+        }
+    })
+
+    socket.on('memory histogram', function (value) {
+        histogramMemory = value;
+        if (chartLoadedMemory) {
+            drawPieChartMemory();
+        }
+    })
+
+    socket.on('drive histogram', function (value) {
+        histogramDrive = value;
+        if (chartLoadedDrive) {
+            drawPieChartDrive();
+        }
+    })
+</script>
+<table class="columns">
+    <tr>
+        <td><div id="chart_cpu"></div>
+        </td>
+        <td><div id="chart_netstat"></div>
+        </td>
+    </tr>
+</table>
+<table class="columns">
+    <tr>
+        <td><div id="chart_memory"></div>
+        </td>
+        <td><div id="chart_drive"></div>
+        </td>
+    </tr>
+</table>
