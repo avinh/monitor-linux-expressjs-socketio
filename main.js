@@ -22,7 +22,7 @@ http.listen(3000, function () {
     }
 
     for (let i = 0; i < histogramLength; i++) {
-        netstatHistogram[i] = [i, 0];
+        netstatHistogram[i] = [i, 0 , 0];
     }
 
     setInterval(() => {
