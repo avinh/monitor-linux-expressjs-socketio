@@ -1,5 +1,6 @@
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
 <script>
     google.charts.load('current', { packages: ['corechart', 'line'] })
     google.charts.setOnLoadCallback(drawBasicCPU);
@@ -53,8 +54,6 @@
         dataNetstat.addColumn('number', 'Down');
         dataNetstat.addRows(histogramNetstat);
 
-        
-
         let options = {
             title: 'Network History',
             hAxis: {
@@ -82,14 +81,15 @@
         data.addColumn('string', 'Menory');
         data.addColumn('number', 'Mb');
         data.addRows([
-            ['Used', histogramMemory.usedMemMb],
-            ['Free', histogramMemory.freeMemMb]
+            ['Used', parseFloat(bytesToSize(histogramMemory.total - histogramMemory.available,2,3).number)],
+            ['Available', parseFloat(bytesToSize(histogramMemory.available,2,3).number)]
         ]);
 
         let options = {
             title: 'How Much Memory',
             width: 600,
-            height: 300
+            height: 300,
+            colors:["#D45C43","#3d6ad6"]
         };
 
         let chart = new google.visualization.PieChart(document.getElementById('chart_memory'));
@@ -102,14 +102,15 @@
         data.addColumn('string', 'Drive');
         data.addColumn('number', 'Gb');
         data.addRows([
-            ['Used', parseInt(histogramDrive.usedGb)],
-            ['Free', parseInt(histogramDrive.freeGb)]
+            ['Used', parseFloat(bytesToSize(histogramDrive.used,2,3).number)],
+            ['Available', parseFloat(bytesToSize(histogramDrive.total - histogramDrive.used,2,3).number)]
         ]);
 
         let options = {
             title: 'How Much Drive',
             width: 600,
-            height: 300
+            height: 300,
+            colors:["#D45C43","#3d6ad6"]
         };
 
         let chart = new google.visualization.PieChart(document.getElementById('chart_drive'));
