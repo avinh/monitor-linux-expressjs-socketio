@@ -13,7 +13,7 @@ npm i
 
 ## Run
 ```bash
-nodemon main
+nodemon server
 ```
 
 ## View
