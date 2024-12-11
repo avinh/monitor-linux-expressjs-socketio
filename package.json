@@ -14,6 +14,6 @@
     "node-os-utils": "^1.2.2",
     "nodemon": "^2.0.3",
     "socket.io": "^2.3.0",
-    "systeminformation": "^4.23.8"
+    "systeminformation": "^5.6.4"
   }
 }
